@@ -1,6 +1,10 @@
-import numpy as np
+import geopandas
+import re
+input=open("inferences.txt","r")
+WKT=[]
+for line in input:
+    line = re.sub(r'[\x00-\x1f]', '', line)
+    WKT.append(f"Point ("+line+")")
 
-data=np.loadtxt("inferences.txt",dtype=np.float64)
-
-xcoord=np.array(data[:,0])
-print(xcoord)
+geopandaData=geopandas.GeoSeries.from_wkt(WKT, index=None, crs=None, on_invalid='raise')
+print(geopandaData)
