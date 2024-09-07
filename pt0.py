@@ -31,7 +31,10 @@ centers=np.sort(centers,axis=0)
 #format the output. 
 #Probably not the best way to do it but if this code was really used on a drone I would just use the pure numpy array
 #D1 code yapping
-str=np.array2string(centers,formatter={'float_kind':lambda x: "%.5f" % x})
+str=np.array2string(centers,formatter={"float_kind":lambda x: "%.5f" % x})
 str=str.replace("["," ").replace("]"," ").replace("  ","")
+#open+write the file
+with open("outputs.out","w") as file:
+    file.write(str)
 
 
