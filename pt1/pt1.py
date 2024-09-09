@@ -1,7 +1,7 @@
 import shapely
 import numpy as np
 import matplotlib.pyplot as plt
-
+import json
 
 #load file
 data=np.loadtxt("pt1/navigate.txt",dtype=np.float64)
@@ -28,32 +28,99 @@ for x,y in waypointcoords:
 
 
 
-
-
-
 waypoint=shapely.Polygon(waypointcoords)
 
 intersect=shapely.intersection(geofence,waypoint)
 
 
-#If a vertice on the intersected polygon is on the geofence, then it will have 2 neighbors that are also on the geofence
-#so we detect the "middle" vertice, keep it ,a delete the other 2 vertices, forming a smooth path around the geofence
+
+#detect the vertices of the intersection that also touch the geofence,add them to an array
 coords=intersect.exterior.coords
-ind=0
+#too lazy to use numpy
+vert=[]
 for coord in coords:
-    if shapely.touches(geofence,shapely.Point(coord)):
-        pass
-        
-    ind+=1
+    x,y=coord
+    if shapely.touches(geofence,shapely.Point(x,y)):
+        plt.plot(x,y,"bo")
+        vert.append([x,y])
+#create snap reference
+ref=shapely.Polygon(vert)
+
+#shrink the snap ref so its 25 feet away from vertices
+xs = list(ref.exterior.coords.xy[0])
+ys = list(ref.exterior.coords.xy[1])
+#find x and y centers
+x_center = 0.5 * min(xs) + 0.5 * max(xs)
+y_center = 0.5 * min(ys) + 0.5 * max(ys)
+#find smallest corner
+min_corner = shapely.Point(min(xs), min(ys))
+center = shapely.Point(x_center, y_center)
+#find scale of the object, so buffering behaves predictably
+shrink_distance = center.distance(min_corner)*0.02
+shrunkref = ref.buffer(-shrink_distance)
+
+x,y=shrunkref.exterior.xy
+plt.plot(x,y,"bo")
 
 
-gx,gy=geofence.exterior.xy
-plt.plot(gx,gy)
-ix,iy=intersect.exterior.xy
-plt.plot(ix,iy,"bo")
+#snap waypoint polygon onto vertices
+waypoint=shapely.snap(waypoint,shrunkref,tolerance=1)
+
+
+#convert to qgroundcontrol json file
+
+data={
+  "fileType": "Plan",
+  "geoFence": {
+    "circles": [],
+    "polygons": [geofencecoords.tolist()],
+    "version": 2
+  },
+  "groundStation": "QGroundControl",
+  "mission": {"plannedHomePosition": waypointcoords.tolist()[0],
+"vehicleType": 2,
+"version": 2,
+"cruiseSpeed": 15,
+"firmwareType": 12,
+"globalPlanAltitudeMode": 1,
+"hoverSpeed": 15,
+"items":[]},
+  "rallyPoints": {
+    "points": [],
+    "version": 2
+  },
+  "version": 1
+}
+num=0
+
+for coords in waypoint.exterior.coords:
+    x,y=coords
+    data["mission"]["items"].append({
+        f"num":{
+                "AMSLAltAboveTerrain":100,
+                "Altitude": 100,
+                "AltitudeMode": 0,
+                "autoContinue": True,
+                "command": 178,
+                "doJumpId": 29,
+                "frame": 2,
+                "params": [
+                    #what
+                    0,
+                    0,
+                    0,
+                    0,
+                    x,
+                    y,
+                    100
+                ],
+                "type": "SimpleItem"
+        }}
 
 
 
+    )
+    num+=1
+print(json.dumps(data))
 
 
-plt.show()
