@@ -66,20 +66,24 @@ plt.plot(x,y,"bo")
 #snap waypoint polygon onto vertices
 waypoint=shapely.snap(waypoint,shrunkref,tolerance=1)
 
-
+homepos=waypointcoords.tolist()[0]
+homepos.append(50)
 #convert to qgroundcontrol json file
 
 data={
   "fileType": "Plan",
   "geoFence": {
     "circles": [],
-    "polygons": [geofencecoords.tolist()],
+    "polygons": [{"inclusion":True,
+        "polygon":geofencecoords.tolist(),
+        "version":1}],
     "version": 2
   },
   "groundStation": "QGroundControl",
-  "mission": {"plannedHomePosition": waypointcoords.tolist()[0],
+  "mission": {"plannedHomePosition": homepos,
 "vehicleType": 2,
 "version": 2,
+"type":1,
 "cruiseSpeed": 15,
 "firmwareType": 12,
 "globalPlanAltitudeMode": 1,
@@ -95,13 +99,13 @@ num=0
 
 for coords in waypoint.exterior.coords:
     x,y=coords
-    data["mission"]["items"].append({
-        f"num":{
-                "AMSLAltAboveTerrain":100,
+    data["mission"]["items"].append(
+        {
+                "AMSLAltAboveTerrain": 100,
                 "Altitude": 100,
-                "AltitudeMode": 0,
+                "AltitudeMode": 1,
                 "autoContinue": True,
-                "command": 178,
+                "command": 0,
                 "doJumpId": 29,
                 "frame": 2,
                 "params": [
@@ -109,18 +113,21 @@ for coords in waypoint.exterior.coords:
                     0,
                     0,
                     0,
-                    0,
+                    None,
                     x,
                     y,
                     100
                 ],
-                "type": "SimpleItem"
-        }}
+                "type": "SimpleItem",
+
+        }
 
 
 
     )
     num+=1
-print(json.dumps(data))
+
+with open("navigate.plan","w") as file:
+    file.write(json.dumps(data))
 
 
