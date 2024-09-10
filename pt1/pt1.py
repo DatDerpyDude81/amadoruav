@@ -1,4 +1,5 @@
 import shapely
+from shapely.ops import nearest_points
 import numpy as np
 import matplotlib.pyplot as plt
 import json
@@ -22,17 +23,19 @@ geofence=shapely.Polygon(geofencecoords)
 index=0
 for x,y in waypointcoords:
     
-    if geofence.contains(shapely.Point(x,y))==False:
+    if geofence.contains(shapely.Point(x,y))==False and shapely.touches(geofence,shapely.Point(x,y))==False:
         waypointcoords=np.delete(waypointcoords,index,0)
+        
     index+=1
 
 
 
 waypoint=shapely.Polygon(waypointcoords)
-
+qx,qy=waypoint.exterior.xy
+plt.plot(qx,qy)
 intersect=shapely.intersection(geofence,waypoint)
 
-
+print(waypointcoords)
 
 #detect the vertices of the intersection that also touch the geofence,add them to an array
 coords=intersect.exterior.coords
@@ -42,34 +45,26 @@ for coord in coords:
     x,y=coord
     if shapely.touches(geofence,shapely.Point(x,y)):
         plt.plot(x,y,"bo")
+
         vert.append([x,y])
+
+waypoint=shapely.Polygon(waypointcoords)
+
+
 #create snap reference
 ref=shapely.Polygon(vert)
 
-#shrink the snap ref so its 25 feet away from vertices
-xs = list(ref.exterior.coords.xy[0])
-ys = list(ref.exterior.coords.xy[1])
-#find x and y centers
-x_center = 0.5 * min(xs) + 0.5 * max(xs)
-y_center = 0.5 * min(ys) + 0.5 * max(ys)
-#find smallest corner
-min_corner = shapely.Point(min(xs), min(ys))
-center = shapely.Point(x_center, y_center)
-#find scale of the object, so buffering behaves predictably
-shrink_distance = center.distance(min_corner)*0.02
-shrunkref = ref.buffer(-shrink_distance)
-
-x,y=shrunkref.exterior.xy
-plt.plot(x,y,"bo")
-
-
-#snap waypoint polygon onto vertices
-waypoint=shapely.snap(waypoint,shrunkref,tolerance=1)
-
-homepos=waypointcoords.tolist()[0]
+waypoint=shapely.snap(waypoint,ref,tolerance=1)
+homepos=waypoint.exterior.coords[0]
+homepos=list(homepos)
 homepos.append(50)
 #convert to qgroundcontrol json file
 
+gx,gy=geofence.exterior.xy
+plt.plot(gx,gy)
+ix,iy=waypoint.exterior.xy
+plt.plot(ix,iy)
+plt.show()
 data={
   "fileType": "Plan",
   "geoFence": {
@@ -83,7 +78,6 @@ data={
   "mission": {"plannedHomePosition": homepos,
 "vehicleType": 2,
 "version": 2,
-"type":1,
 "cruiseSpeed": 15,
 "firmwareType": 12,
 "globalPlanAltitudeMode": 1,
@@ -105,7 +99,7 @@ for coords in waypoint.exterior.coords:
                 "Altitude": 100,
                 "AltitudeMode": 1,
                 "autoContinue": True,
-                "command": 0,
+                "command": 16,
                 "doJumpId": 29,
                 "frame": 2,
                 "params": [
