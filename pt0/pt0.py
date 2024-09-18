@@ -3,7 +3,6 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn.neighbors import LocalOutlierFactor
 import numpy as np
-import re
 #load data as a numpy array
 data=np.loadtxt("inferences.txt",dtype=np.float64)
 #require moar digits
