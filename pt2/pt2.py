@@ -30,7 +30,7 @@ for shape in shapes:
         if shape=="semicircle":
             draw.pieslice([(posx-size,posy-size*1.5),(posx+size,posy+size*0.5)],0,180,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
         if shape=="quartercircle":
-            draw.pieslice([(posx-size*1.3,posy-size*1.5),(posx+size*0.7,posy+size*0.5)],0,90,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+            draw.pieslice([(posx-size*1.4,posy-size*1.4),(posx+size*0.6,posy+size*0.6)],0,90,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
             
         
 
