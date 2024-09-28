@@ -21,16 +21,41 @@ for shape in shapes:
         if size+posy>dim:
             posy=dim-size
     
-        im = Image.new(mode="RGB", size=(dim, dim))
+        im = Image.new("RGB", size=(dim, dim))
 
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype("pt2/sans-serif.ttf", size)
         if shape=="circle":
             draw.circle((posx,posy), size, fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), outline=None, width=1)
         if shape=="semicircle":
-            draw.pieslice([(posx-size,posy-size*1.5),(posx+size,posy+size*0.5)],0,180,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+            draw.pieslice([(posx-size,posy-size*1.4),(posx+size,posy+size*0.6)],0,180,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
         if shape=="quartercircle":
             draw.pieslice([(posx-size*1.4,posy-size*1.4),(posx+size*0.6,posy+size*0.6)],0,90,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        if shape=="triangle":
+            draw.regular_polygon((posx,posy,size),3,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        if shape=="rectangle":
+            draw.rectangle([(posx-size,posy-size),(posx+size,posy+size)],fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        if shape=="pentagon":
+            draw.regular_polygon((posx,posy,size),5,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        if shape=="star":
+            pentagon=[]
+            
+            for n in range(0,5):
+                #generate outer point
+                x = size*math.cos(math.radians(-90+n*72))+posx
+                y = size*math.sin(math.radians(-90+n*72))+posy
+                #generate concave point
+                inx = size/2.6*math.cos(math.radians(-54+n*72))+posx
+                iny = size/2.6*math.sin(math.radians(-54+n*72))+posy
+                #append to coord list
+                pentagon.append((x,y))
+                pentagon.append((inx,iny))
+
+                
+
+
+                
+            draw.polygon(pentagon,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
             
         
 
