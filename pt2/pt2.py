@@ -25,6 +25,8 @@ for shape in shapes:
 
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype("pt2/sans-serif.ttf", size)
+        
+        #polygonnnssssss
         if shape=="circle":
             draw.circle((posx,posy), size, fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), outline=None, width=1)
         if shape=="semicircle":
@@ -50,17 +52,22 @@ for shape in shapes:
                 #append to coord list
                 pentagon.append((x,y))
                 pentagon.append((inx,iny))
+                draw.polygon(pentagon,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        if shape=="cross":
+            fillcolor=(random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            draw.line([(posx,posy+size/1.5),(posx,posy-size/1.5)],fill=fillcolor,width=math.floor(size/2))
+            draw.line([(posx+size/1.5,posy),(posx-size/1.5,posy)],fill=fillcolor,width=math.floor(size/2))
 
                 
 
 
                 
-            draw.polygon(pentagon,fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+            
             
         
 
         draw.text((posx, posy),letter,(255,255,255),font=font,anchor="mm")
-
+        im=im.rotate(random.randint(0,360))
         im.save(f"{letter}{shape}.jpg")
 
         
