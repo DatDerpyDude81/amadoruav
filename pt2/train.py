@@ -1,3 +1,3 @@
 from ultralytics import YOLO
-model=YOLO("yolov8n.pt")
-print(model.predict(source="pt2/training/images/ccircle1.jpg",conf=0.25))
+model = YOLO("yolov8n-cls.yaml",task="classify")
+reuslts = model.train(data="/Users/matthewyang/amadoruav/pt2/data", model="yolov8n-cls.yaml",epochs=10)

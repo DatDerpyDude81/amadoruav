@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw,ImageFont
 import PIL
 import random
 import math
-
+import os
 alphabet=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 shapes=["circle","semicircle","quartercircle","triangle","rectangle","pentagon","star","cross"]
@@ -70,12 +70,12 @@ for i in range(20):
             draw.text((posx, posy),letter,(255,255,255),font=font,anchor="mm")
             im=im.rotate(random.randint(0,360))
             
-            im.save(f"pt2/data/training/images/{shape}{letter}{i}.jpg")
-            with open(f"pt2/data/training/labels/{shape}{letter}{i}.txt","x") as label:
-                label.write(f"{shape}_{letter}")
+            im.save(f"pt2/data/train/{shape} {letter}/{i}.jpg")
+
                 
 for i in range(20):
     for shape in shapes:
+        
         for letter in alphabet:
             dim=random.randint(100,1000)
             size=random.randint(15,math.floor(dim*0.5))
@@ -138,9 +138,8 @@ for i in range(20):
             draw.text((posx, posy),letter,(255,255,255),font=font,anchor="mm")
             im=im.rotate(random.randint(0,360))
             
-            im.save(f"pt2/data/testing/images/{shape}{letter}{i}.jpg")
-            with open(f"pt2/data/testing/labels/{shape}{letter}{i}.txt","x") as label:
-                label.write(f"{shape}_{letter}")
+            im.save(f"pt2/data/val/{shape} {letter}/{i}.jpg")
+
                 
                 
 
