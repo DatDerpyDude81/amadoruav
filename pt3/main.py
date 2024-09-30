@@ -2,7 +2,10 @@ import asyncio
 from mavsdk import System
 import mavsdk
 import mavsdk.telemetry
+#The examples in the mavsdk repo were REALLY helpful
 
+
+#safety check
 async def safetycheck(drone):
     if(mavsdk.telemetry.Health(True,True,True,True,True,True,True)==False):
         #yo drones boutta crash
@@ -24,6 +27,7 @@ async def safetycheck(drone):
 
 async def run():
     drone = System()
+    #replace address with udp num
     await drone.connect(system_address="ADDRESS")
 
     print("Waiting for drone to connect...")
@@ -32,11 +36,6 @@ async def run():
             print(f"-- Connected to drone!")
             break
 
-    print("Waiting for drone to have a global position estimate...")
-    async for health in drone.telemetry.health():
-        if health.is_global_position_ok and health.is_home_position_ok:
-            print("-- Global position state is good enough for flying.")
-            break
 
     print("Fetching amsl altitude at home location....")
     async for terrain_info in drone.telemetry.home():
@@ -54,6 +53,7 @@ async def run():
     flying_alt = absolute_altitude + 20.0
     await safetycheck(drone)
     # goto_location() takes Absolute MSL altitude
+    #replace GPSX and GPSY with the desired pos
     await drone.action.goto_location("GPSX", "GPSY", flying_alt, 0)
     await safetycheck(drone)
     await asyncio.sleep(1)

@@ -38,7 +38,7 @@ intersect=shapely.intersection(geofence,waypoint)
 print(waypointcoords)
 
 #detect the vertices of the intersection that also touch the geofence,add them to an array
-coords=intersect.exterior.coords
+coords=intersect.exterior.coords # type: ignore
 #too lazy to use numpy
 vert=[]
 for coord in coords:
